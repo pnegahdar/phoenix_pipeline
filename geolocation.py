@@ -83,7 +83,7 @@ def query_cliff(sentence, host, port):
                               'stateName': stateName}
                 return place_info
             except:
-                logger.warning("Error on story. It thought there were multiple cities")
+                logger.warning("Error on story. (multiple cities)")
                 logger.info(sentence)
                 return place_info
         # If there's only one city, we're good to go.
@@ -111,7 +111,7 @@ def query_cliff(sentence, host, port):
                               'stateName': stateName}
                 return place_info
             except:
-                logger.warning("Error on story. It thought there was 1 city.")
+                logger.warning("Error on story. (city == 1).")
                 logger.info(sentence)
                 return place_info
     # If there's no city, we'll take a state.
@@ -138,8 +138,8 @@ def query_cliff(sentence, host, port):
                               'stateName': stateName}
                 return place_info
             except:
-                logger.warning("""Error on story. It thought there were no
-                               cities but 1 state.""")
+                logger.warning("""Error on story. (cities == 0, states !=
+                        0)""")
                 logger.info(sentence)
                 return place_info
     #if ((focus['cities'] == []) & len(focus['states']) > 0):
@@ -153,12 +153,11 @@ def query_cliff(sentence, host, port):
             countryCode = focus['countries'][0]['countryCode']
             placeName = focus['countries'][0]['name']
             place_info = {'lat': lat, 'lon': lon, 'placeName': placeName,
-                          'restype': 'country', 'countryCode': placeCode,
+                          'restype': 'country', 'countryCode': countryCode,
                           'stateName': ''}
             return place_info
         except:
-            logger.warning("""Error on story. It thought there were no cities
-                           or states--going for country""")
+            logger.warning("""Error on story. (cities == 0, states == 0)""")
             logger.info(sentence)
             return place_info
 
