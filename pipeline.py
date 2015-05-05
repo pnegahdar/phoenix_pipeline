@@ -1,10 +1,10 @@
 from __future__ import print_function
 from __future__ import unicode_literals
+import os
 import sys
 import logging
 import datetime
 import dateutil
-import uploader
 import utilities
 import formatter
 import postprocess
@@ -13,6 +13,10 @@ import result_formatter
 import scraper_connection
 from petrarch import petrarch
 
+if os.getenv("USE_DB"):
+    import uploader_db as uploader
+else:
+    import uploader
 
 def main(file_details, server_details, logger_file=None, run_filter=None,
          run_date='', version=''):

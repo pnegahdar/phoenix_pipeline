@@ -1,7 +1,9 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 import io
+import uuid
 import logging
+
 import geolocation
 
 
@@ -28,9 +30,6 @@ def create_strings(events, version):
                     delimiter.
     """
     event_output = []
-    with open('counter.txt', 'r') as f:
-        id_count = int(f.read().replace('\n', ''))
-
     for event in events:
         formatted, actors = split_process(event)
         year, month, day = formatted[:3]
@@ -57,7 +56,7 @@ def create_strings(events, version):
         actor_info = '\t'.join(actors)
         print('Event: {}\t{}\t{}\t{}\t{}'.format(story_date, actor_info, code,
                                                  ids, sources))
-        id_string = '{}_{}'.format(id_count, version)
+        id_string = '{}_{}'.format(uuid.uuid4().get_hex, version)
         event_str = '{}\t{}\t{}\t{}\t{}\t{}'.format(id_string, story_date,
                                                     year, month, day,
                                                     actor_info)
@@ -79,12 +78,7 @@ def create_strings(events, version):
         event_str += '\t{}\t{}\t{}'.format(ids, urls, sources)
         event_output.append(event_str)
 
-        id_count += 1
-
     event_strings = '\n'.join(event_output)
-
-    with open('counter.txt', 'w') as f:
-        f.write(str(id_count))
 
     return event_strings
 
@@ -155,8 +149,8 @@ def process_cameo(event):
                        '06': 2, '07': 2, '08': 2, '09': 3, '10': 3,
                        '11': 3, '12': 3, '13': 3, '14': 4, '15': 4,
                        '16': 3, '17': 4, '18': 4, '19': 4, '20': 4}
-    #Goldstein values pulled from
-    #http://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt
+    # Goldstein values pulled from
+    # http://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt
     goldstein_scale = {'01': 0.0, '010': 0.0, '011': -0.1, '0110': -0.1,
                        '012': -0.4, '013': 0.4, '014': 0.0, '015': 0.0,
                        '016': 3.4, '017': 0.0, '018': 3.4, '02': 3.0,
@@ -272,34 +266,34 @@ def process_actors(event):
             one of GOV, MIL, REB, OPP, PTY, COP, JUD, SPY, MED, EDU, BUS, CRM,
             or CVL. The ``others`` contains all other actor or agent codes.
     """
-    countries = ('ABW', 'AFG', 'AGO', 'AIA', 'ALA', 'ALB', 'AND', 'ARE', 
-            'ARG', 'ARM', 'ASM', 'AUT', 'AZE', 'BDI', 'BEL', 'BEN', 'BES',
-            'BFA', 'BGD', 'BGR', 'BHR', 'BHS', 'BIH', 'BLM', 'BLR', 'BLZ',
-            'BMU', 'BOL', 'BRA', 'BRB', 'BRN', 'BTN', 'BYS', 'BWA', 'CAF',
-            'CAN', 'CHE', 'CHL', 'CHN', 'CIV', 'CMR', 'COD', 'COG', 'COK',
-            'COL', 'COM', 'CPV', 'CRI', 'CSK', 'CUB', 'CUW', 'CYM', 'CYP',
-            'CZE', 'DDR', 'DEU', 'DJI', 'DMA', 'DNK', 'DOM', 'DZA', 'ECU',
-            'EGY', 'ERI', 'ESH', 'ESP', 'EST', 'ETH', 'FIN', 'FJI', 'FLK',
-            'FRA', 'FRO', 'FSM', 'GAB', 'GBR', 'GEO', 'GGY', 'GHA', 'GIB',
-            'GIN', 'GLP', 'GMB', 'GNB', 'GNQ', 'GRC', 'GRD', 'GRL', 'GTM',
-            'GUF', 'GUM', 'GUY', 'HKG', 'HND', 'HRV', 'HTI', 'HUN', 'IDN',
-            'IMN', 'IND', 'IRL', 'IRN', 'IRQ', 'ISL', 'ISR', 'ITA', 'JAM',
-            'JEY', 'JOR', 'JPN', 'KAZ', 'KEN', 'KGZ', 'KHM', 'KIR', 'KNA',
-            'KOR', 'KSV', 'KWT', 'LAO', 'LBN', 'LBR', 'LBY', 'LCA', 'LIE',
-            'LKA', 'LSO', 'LTU', 'LUX', 'LVA', 'MAC', 'MAF', 'MAR', 'MCO',
-            'MDA', 'MDG', 'MDV', 'MEX', 'MHL', 'MKD', 'MLI', 'MLT', 'MMR',
-            'MNE', 'MNG', 'MNP', 'MOZ', 'MRT', 'MSR', 'MTQ', 'MUS', 'MWI',
-            'MYS', 'MYT', 'NAM', 'NCL', 'NER', 'NFK', 'NGA', 'NIC', 'NIU',
-            'NLD', 'NOR', 'NPL', 'NRU', 'NZL', 'OMN', 'PAK', 'PAN', 'PCN',
-            'PER', 'PHL', 'PLW', 'PNG', 'POL', 'PRI', 'PRK', 'PRT', 'PRY',
-            'PSE', 'PYF', 'QAT', 'REU', 'ROU', 'RUS', 'RWA', 'SAU', 'SCG',
-            'SDN', 'SEN', 'SGP', 'SHN', 'SJM', 'SLB', 'SLE', 'SLV', 'SMR',
-            'SOM', 'SPM', 'SRB', 'SSD', 'SUN', 'STP', 'SUR', 'SVK', 'SVN',
-            'SWE', 'SWZ', 'SXM', 'SYC', 'SYR', 'TCA', 'TCD', 'TGO', 'THA',
-            'TJK', 'TMP', 'TKL', 'TKM', 'TLS', 'TON', 'TTO', 'TUN', 'TUR',
-            'TWN', 'TUV', 'TZA', 'UGA', 'UKR', 'URY', 'USA', 'UZB', 'VAT',
-            'VCT', 'VEN', 'VGB', 'VIR', 'VNM', 'VUT', 'WLF', 'WSM', 'YEM',
-            'YMD', 'YUG', 'ZAF', 'ZAR', 'ZMB', 'ZWE', 'ATG', 'AUS')
+    countries = ('ABW', 'AFG', 'AGO', 'AIA', 'ALA', 'ALB', 'AND', 'ARE',
+                 'ARG', 'ARM', 'ASM', 'AUT', 'AZE', 'BDI', 'BEL', 'BEN', 'BES',
+                 'BFA', 'BGD', 'BGR', 'BHR', 'BHS', 'BIH', 'BLM', 'BLR', 'BLZ',
+                 'BMU', 'BOL', 'BRA', 'BRB', 'BRN', 'BTN', 'BYS', 'BWA', 'CAF',
+                 'CAN', 'CHE', 'CHL', 'CHN', 'CIV', 'CMR', 'COD', 'COG', 'COK',
+                 'COL', 'COM', 'CPV', 'CRI', 'CSK', 'CUB', 'CUW', 'CYM', 'CYP',
+                 'CZE', 'DDR', 'DEU', 'DJI', 'DMA', 'DNK', 'DOM', 'DZA', 'ECU',
+                 'EGY', 'ERI', 'ESH', 'ESP', 'EST', 'ETH', 'FIN', 'FJI', 'FLK',
+                 'FRA', 'FRO', 'FSM', 'GAB', 'GBR', 'GEO', 'GGY', 'GHA', 'GIB',
+                 'GIN', 'GLP', 'GMB', 'GNB', 'GNQ', 'GRC', 'GRD', 'GRL', 'GTM',
+                 'GUF', 'GUM', 'GUY', 'HKG', 'HND', 'HRV', 'HTI', 'HUN', 'IDN',
+                 'IMN', 'IND', 'IRL', 'IRN', 'IRQ', 'ISL', 'ISR', 'ITA', 'JAM',
+                 'JEY', 'JOR', 'JPN', 'KAZ', 'KEN', 'KGZ', 'KHM', 'KIR', 'KNA',
+                 'KOR', 'KSV', 'KWT', 'LAO', 'LBN', 'LBR', 'LBY', 'LCA', 'LIE',
+                 'LKA', 'LSO', 'LTU', 'LUX', 'LVA', 'MAC', 'MAF', 'MAR', 'MCO',
+                 'MDA', 'MDG', 'MDV', 'MEX', 'MHL', 'MKD', 'MLI', 'MLT', 'MMR',
+                 'MNE', 'MNG', 'MNP', 'MOZ', 'MRT', 'MSR', 'MTQ', 'MUS', 'MWI',
+                 'MYS', 'MYT', 'NAM', 'NCL', 'NER', 'NFK', 'NGA', 'NIC', 'NIU',
+                 'NLD', 'NOR', 'NPL', 'NRU', 'NZL', 'OMN', 'PAK', 'PAN', 'PCN',
+                 'PER', 'PHL', 'PLW', 'PNG', 'POL', 'PRI', 'PRK', 'PRT', 'PRY',
+                 'PSE', 'PYF', 'QAT', 'REU', 'ROU', 'RUS', 'RWA', 'SAU', 'SCG',
+                 'SDN', 'SEN', 'SGP', 'SHN', 'SJM', 'SLB', 'SLE', 'SLV', 'SMR',
+                 'SOM', 'SPM', 'SRB', 'SSD', 'SUN', 'STP', 'SUR', 'SVK', 'SVN',
+                 'SWE', 'SWZ', 'SXM', 'SYC', 'SYR', 'TCA', 'TCD', 'TGO', 'THA',
+                 'TJK', 'TMP', 'TKL', 'TKM', 'TLS', 'TON', 'TTO', 'TUN', 'TUR',
+                 'TWN', 'TUV', 'TZA', 'UGA', 'UKR', 'URY', 'USA', 'UZB', 'VAT',
+                 'VCT', 'VEN', 'VGB', 'VIR', 'VNM', 'VUT', 'WLF', 'WSM', 'YEM',
+                 'YMD', 'YUG', 'ZAF', 'ZAR', 'ZMB', 'ZWE', 'ATG', 'AUS')
     root_actors = ('IGO', 'NGO', 'IMG', 'MNC')
     primary_agent = ('GOV', 'MIL', 'REB', 'OPP', 'PTY', 'COP', 'JUD', 'SPY',
                      'MED', 'EDU', 'BUS', 'CRM', 'CVL')
