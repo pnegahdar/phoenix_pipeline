@@ -5,8 +5,10 @@ futures==2.2.0
 Jinja2==2.7.2
 MarkupSafe==0.23
 numpydoc==0.4
+peewee==2.6.0
 -e git+https://github.com/openeventdata/petrarch.git@5fe92b676e8b4fb9a1964e7da55e9c95e9a5745f#egg=petrarch-master
 pexpect==3.2
+psycopg2==2.6
 Pygments==1.6
 pymongo==2.7
 python-dateutil==2.2
